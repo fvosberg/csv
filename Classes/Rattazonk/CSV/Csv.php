@@ -17,6 +17,12 @@ class Csv {
 	protected $separator = ',';
 
 	/**
+	 * field enclosure
+	 * @var string
+	 */
+	protected $enclosure = '"';
+
+	/**
 	 * @param resource $resource
 	 */
 	public function setResource($resource) {
@@ -29,7 +35,7 @@ class Csv {
 	public function toArray() {
 		$array = explode($this->separator, fgets($this->resource));
 		foreach($array as &$v) {
-			$v = trim($v, '"');
+			$v = trim($v, $this->enclosure);
 		}
 		return $array;
 	}
@@ -39,6 +45,13 @@ class Csv {
 	 */
 	public function setSeparator($separator) {
 		$this->separator = $separator;
+	}
+
+	/**
+	 * @param string $enclosure field enclosure
+	 */
+	public function setEnclosure($enclosure) {
+		$this->enclosure = $enclosure;
 	}
 
 	/**

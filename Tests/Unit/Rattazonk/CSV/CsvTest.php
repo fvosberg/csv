@@ -60,4 +60,15 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 		self::assertEquals(['foo', 'bar', 'fooo'], $this->subject->toArray());
 	}
 
+	/**
+	 * @test
+	 */
+	public function canConfigureEnclosure() {
+		$this->subject->setEnclosure('&');
+
+		$this->subject->readString('&foo&,&bar&,&fooo&');
+
+		self::assertEquals(['foo', 'bar', 'fooo'], $this->subject->toArray());
+	}
+
 }
