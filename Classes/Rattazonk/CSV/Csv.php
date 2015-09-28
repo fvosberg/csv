@@ -11,13 +11,10 @@ class Csv {
 	protected $resource;
 
 	/**
-	 * instantiates CSV from string
+	 * field separator
+	 * @var string
 	 */
-	public static function readFromString($string) {
-		$instance = new static();
-		$instance->setResource(fopen("data://text/plain,$string", 'r'));
-		return $instance;
-	}
+	protected $separator = ',';
 
 	/**
 	 * @param resource $resource
@@ -30,6 +27,20 @@ class Csv {
 	 * @return array
 	 */
 	public function toArray() {
-		return explode(',', fgets($this->resource));
+		return explode($this->separator, fgets($this->resource));
+	}
+
+	/**
+	 * @param string $separator separator for fields
+	 */
+	public function setSeparator($separator) {
+		$this->separator = $separator;
+	}
+
+	/**
+	 * @param string $input
+	 */
+	public function readString($input) {
+		$this->resource = fopen("data://text/plain,$input", 'r');
 	}
 }

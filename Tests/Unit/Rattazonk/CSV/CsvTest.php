@@ -28,8 +28,19 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 	 * @test
 	 */
 	public function canReadCsvStringWithOneLine() {
-		$subject = Csv::readFromString('foo,bar,foo');
+		$this->subject->readString('foo,bar,foo');
 
-		self::assertEquals(['foo','bar','foo'], $subject->toArray());
+		self::assertEquals(['foo','bar','foo'], $this->subject->toArray());
+	}
+
+	/**
+	 * @test
+	 */
+	public function canConfigureSeparator() {
+		$this->subject->setSeparator(';');
+
+		$this->subject->readString('foo;bar;foo,foo');
+
+		self::assertEquals(['foo', 'bar', 'foo,foo'], $this->subject->toArray());
 	}
 }
