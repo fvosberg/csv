@@ -33,9 +33,13 @@ class Csv {
 	 * @return array
 	 */
 	public function toArray() {
-		$array = explode($this->separator, fgets($this->resource));
-		foreach($array as &$v) {
-			$v = trim($v, $this->enclosure);
+		$array = [];
+		while(($line = fgets($this->resource)) !== FALSE) {
+			$current_line = explode($this->separator, $line);
+			foreach($current_line as &$column) {
+				$column = trim($column, $this->enclosure);
+			}
+			$array[] = $current_line;
 		}
 		return $array;
 	}
