@@ -1,0 +1,28 @@
+{
+  "name": "CSV",
+  "version": "1.0.0",
+  "description": "PHP CSV library",
+  "dependencies": {
+    "gulp": "^3.9.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  },
+  "scripts": {
+    "test": "/vendor/bin/phpunit Tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Rattazonk/CSV.git"
+  },
+  "keywords": [
+    "php",
+    "csv"
+  ],
+  "author": "Frederik Vosberg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rattazonk/CSV/issues"
+  },
+  "homepage": "https://github.com/Rattazonk/CSV"
+}
