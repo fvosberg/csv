@@ -1,6 +1,8 @@
 <?php
 namespace Tests\Unit\Rattazonk\CSV;
 
+use Rattazonk\CSV\Csv;
+
 /**
  * @author Frederik Vosberg <frederik@rattazonk.com>
  */
@@ -12,7 +14,7 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 
 	protected function setUp() {
 		parent::setUp();
-		$this->subject = new \Rattazonk\CSV\Csv();
+		$this->subject = new Csv();
 	}
 
 	/**
@@ -20,5 +22,14 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function canBeInstantiated() {
 		self::assertInstanceOf('\Rattazonk\CSV\Csv', $this->subject);
+	}
+
+	/**
+	 * @test
+	 */
+	public function canReadCsvStringWithOneLine() {
+		$subject = Csv::readFromString('foo,bar,foo');
+
+		self::assertEquals(['foo','bar','foo'], $subject->toArray());
 	}
 }
