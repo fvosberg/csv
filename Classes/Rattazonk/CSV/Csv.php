@@ -27,7 +27,11 @@ class Csv {
 	 * @return array
 	 */
 	public function toArray() {
-		return explode($this->separator, fgets($this->resource));
+		$array = explode($this->separator, fgets($this->resource));
+		foreach($array as &$v) {
+			$v = trim($v, '"');
+		}
+		return $array;
 	}
 
 	/**

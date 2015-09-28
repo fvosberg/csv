@@ -26,11 +26,18 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @test
+	 * @dataProvider oneLinerWithComma
 	 */
-	public function canReadCsvStringWithOneLine() {
-		$this->subject->readString('foo,bar,foo');
+	public function canReadCsvStringWithOneLine($output, $input) {
+		$this->subject->readString($input);
 
-		self::assertEquals(['foo','bar','foo'], $this->subject->toArray());
+		self::assertEquals($output, $this->subject->toArray());
+	}
+
+	public function oneLinerWithComma() {
+		return [
+			[['foo','bar','foo'], 'foo,bar,foo']
+		];
 	}
 
 	/**
@@ -43,4 +50,14 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 
 		self::assertEquals(['foo', 'bar', 'foo,foo'], $this->subject->toArray());
 	}
+
+	/**
+	 * @test
+	 */
+	public function canReadEnclosedCsvString() {
+		$this->subject->readString('"foo","bar","fooo"');
+
+		self::assertEquals(['foo', 'bar', 'fooo'], $this->subject->toArray());
+	}
+
 }
