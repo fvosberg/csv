@@ -9,12 +9,21 @@ gulp.task('test', function() {
 		return test_file.slice(0, -4) + 'Test.php';
 	};
 
-	gulp.watch('Classes/**/*.php', function(event) {
-		var test_file = class_file_to_test_file(event.path);
-		var test_command = 'vendor/bin/phpunit ' + test_file;
+	var exec_phpunit_for_test_file = function(path) {
+		var test_command = 'vendor/bin/phpunit ' + path;
 		console.log(test_command);
 		exec(test_command, function(error, stdout) {
 			console.log(stdout);
 		});
+	};
+
+	gulp.watch('Classes/**/*.php', function(event) {
+		var test_file = class_file_to_test_file(event.path);
+		exec_phpunit_for_test_file(test_file);
+	});
+
+	gulp.watch('Tests/Unit/**/*Test.php', function(event) {
+		var test_file = event.path;
+		exec_phpunit_for_test_file(test_file);
 	});
 });
