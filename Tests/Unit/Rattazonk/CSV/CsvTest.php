@@ -43,6 +43,25 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @test
 	 */
+	public function canReadCsvStringWithMultipleLines() {
+		$lines = [
+			'foo,bar,barfoo',
+			'"bar","foobar","baz"'
+		];
+
+		$this->subject->readString(implode("\n", $lines));
+
+		self::assertEquals([
+				['foo', 'bar', 'barfoo'],
+				['bar', 'foobar', 'baz']
+			],
+			$this->subject->toArray()
+		);
+	}
+
+	/**
+	 * @test
+	 */
 	public function canConfigureSeparator() {
 		$this->subject->setSeparator(';');
 

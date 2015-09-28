@@ -35,6 +35,7 @@ class Csv {
 	public function toArray() {
 		$array = [];
 		while(($line = fgets($this->resource)) !== FALSE) {
+			$line = rtrim($line, "\n");
 			$current_line = explode($this->separator, $line);
 			foreach($current_line as &$column) {
 				$column = trim($column, $this->enclosure);
