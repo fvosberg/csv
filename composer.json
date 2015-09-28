@@ -1,0 +1,15 @@
+{
+    "name": "rattazonk/csv",
+    "type": "library",
+    "description": "A php library for csv handling.",
+    "license": ["LGPL-3.0", "MIT"],
+    "require": {},
+    "require-dev": {
+		"phpunit/phpunit": "^4.8"
+	},
+    "autoload": {
+        "psr-0": {
+            "Rattazonk\\CSV": "Classes"
+        }
+    }
+}
