@@ -90,4 +90,17 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 		self::assertEquals([['foo', 'bar', 'fooo']], $this->subject->toArray());
 	}
 
+	/**
+	 * @test
+	 */
+	public function canConfigureLineTerminator() {
+		$this->subject->setLineTerminator('E');
+
+		$this->subject->readString('"foo","bar"E"bar,"' . "\n" . 'foo"');
+
+		self::assertEquals(
+			[['foo', 'bar'], ['bar', "\nfoo"]],
+			$this->subject->toArray()
+		);
+	}
 }

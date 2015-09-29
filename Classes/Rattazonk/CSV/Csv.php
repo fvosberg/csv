@@ -23,6 +23,11 @@ class Csv {
 	protected $enclosure = '"';
 
 	/**
+	 * @var string
+	 */
+	protected $lineTerminator = "\n";
+
+	/**
 	 * @param resource $resource
 	 */
 	public function setResource($resource) {
@@ -33,16 +38,28 @@ class Csv {
 	 * @return array
 	 */
 	public function toArray() {
-		$array = [];
-		while(($line = fgets($this->resource)) !== FALSE) {
-			$line = rtrim($line, "\n");
-			$current_line = explode($this->separator, $line);
-			foreach($current_line as &$column) {
+		$lines = [];
+		$currentLine = '';
+		while(($char = fgetc($this->resource)) !== FALSE) {
+			if($char !== $this->lineTerminator){
+				$currentLine .= $char;
+			} else {
+				$lines[] = $currentLine;
+				$currentLine = '';
+			}
+		}
+		// if the last char is not a line terminator the last line must be added 
+		// separatly
+		if($currentLine) {
+			$lines[] = $currentLine;
+		}
+		foreach($lines as &$line) {
+			$line = explode($this->separator, $line);
+			foreach($line as &$column) {
 				$column = trim($column, $this->enclosure);
 			}
-			$array[] = $current_line;
 		}
-		return $array;
+		return $lines;
 	}
 
 	/**
@@ -57,6 +74,13 @@ class Csv {
 	 */
 	public function setEnclosure($enclosure) {
 		$this->enclosure = $enclosure;
+	}
+
+	/**
+	 * @param string $lineTerminator line terminator
+	 */
+	public function setLineTerminator($lineTerminator) {
+		$this->lineTerminator = $lineTerminator;
 	}
 
 	/**
