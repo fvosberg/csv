@@ -6,11 +6,6 @@ namespace Rattazonk\CSV;
  */
 class Csv {
 	/**
-	 * @var resource
-	 */
-	protected $resource;
-
-	/**
 	 * field separator
 	 * @var string
 	 */
@@ -26,6 +21,21 @@ class Csv {
 	 * @var string
 	 */
 	protected $lineTerminator = "\n";
+
+	/**
+	 * @var resource
+	 */
+	protected $resource;
+
+	/**
+	 * @var string
+	 */
+	protected $currentCharacter;
+
+	/**
+	 * @var string
+	 */
+	protected $lastCharacter;
 
 	/**
 	 * @param resource $resource
@@ -60,6 +70,51 @@ class Csv {
 			}
 		}
 		return $lines;
+	}
+
+	/**
+	 * returns the value of the next field in the current row
+	 * if there is no remaining field it returns FALSE
+	 *
+	 * @return string|FALSE
+	 */
+	public function getNextFieldInCurrentRow() {
+		$field = '';
+		$enclosed = FALSE;
+		while($this->getNextCharacter()) {
+			// this field ends when a separator is found
+			if($this->currentCharacter === $this->separator) {
+				break;
+			}
+			if(!$field && $this->currentCharacter == $this->enclosure) {
+				$enclosed = TRUE;
+				continue;
+			}
+			if($enclosed && $this->currentCharacter == $this->enclosure && $this->lastCharacter !== $this->enclosure) {
+				continue;
+			}
+			$field .= $this->getCurrentCharacter();
+		}
+		return $field ? $field : FALSE;
+	}
+
+	/**
+	 * advances the internal character pointer
+	 * and returns the new char
+	 *
+	 * @return string
+	 */
+	public function getNextCharacter() {
+		$this->lastCharacter = $this->currentCharacter;
+		$this->currentCharacter = fgetc($this->resource);
+		return $this->currentCharacter;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCurrentCharacter() {
+		return $this->currentCharacter;
 	}
 
 	/**

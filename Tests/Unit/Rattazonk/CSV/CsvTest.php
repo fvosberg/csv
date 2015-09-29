@@ -103,4 +103,43 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 			$this->subject->toArray()
 		);
 	}
+
+	/**
+	 * @test
+	 */
+	public function getNextCharacter() {
+		$this->subject->readString('"foo","bar",foobaz');
+
+		self::assertEquals('"', $this->subject->getNextCharacter());
+		self::assertEquals('"', $this->subject->getCurrentCharacter());
+
+		self::assertEquals('f', $this->subject->getNextCharacter());
+		self::assertEquals('f', $this->subject->getCurrentCharacter());
+	}
+
+	/**
+	 * @test
+	 * @dataProvider firstFieldValues
+	 */
+	public function getFirstFieldByNextFieldInCurrentRow($expected, $input) {
+		$this->subject->readString($input);
+
+		self::assertEquals($expected, $this->subject->getNextFieldInCurrentRow());
+	}
+
+	public function firstFieldValues() {
+		return [
+			// expected => input
+			['foo', 'foo,'],
+			['foo', '"foo",'],
+			['fo"o', '"fo""o",'],
+			['fo"o', 'fo"o,']
+		];
+	}
+
+	/**
+	 * @depends getFirstFieldByNextFieldInCurrentRow
+	 */
+	public function getFollowingFieldByNextFieldInCurrentRow($subject) {
+	}
 }
