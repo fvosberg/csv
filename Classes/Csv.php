@@ -88,11 +88,9 @@ class Csv {
 		if($this->currentCharacter != $this->lineTerminator || $this->jumpToNextRow) {
 			$this->jumpToNextRow = FALSE;
 			while($this->getNextCharacter()) {
-				// this field ends when a separator is found
-				if(!$enclosed && $this->currentCharacter === $this->separator) {
+				if($this->currentCharacter === $this->separator && !$enclosed) {
 					break;
-				}
-				if($this->currentCharacter == $this->enclosure) {
+				} else if($this->currentCharacter == $this->enclosure) {
 					if(!$field) {
 						$enclosed = TRUE;
 						continue;
@@ -102,9 +100,10 @@ class Csv {
 					} else if($this->lastCharacter == $this->enclosure) {
 						$enclosed = TRUE;
 					}
-				}
-				if(!$enclosed && $this->currentCharacter == $this->lineTerminator) {
-					break;
+				} else if($this->currentCharacter == $this->lineTerminator) {
+					if(!$enclosed) {
+						break;
+					}
 				}
 				$field .= $this->getCurrentCharacter();
 			}
