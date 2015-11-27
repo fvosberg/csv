@@ -89,7 +89,7 @@ class Csv {
 			$this->jumpToNextRow = FALSE;
 			while($this->getNextCharacter()) {
 				// this field ends when a separator is found
-				if($this->currentCharacter === $this->separator) {
+				if(!$enclosed && $this->currentCharacter === $this->separator) {
 					break;
 				}
 				if($this->currentCharacter == $this->enclosure) {

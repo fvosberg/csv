@@ -96,7 +96,7 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 	public function canConfigureLineTerminator() {
 		$this->subject->setLineTerminator('E');
 
-		$this->subject->readString('"foo","bar"E"bar,"' . "\n" . 'foo"');
+		$this->subject->readString('"foo","bar"Ebar,"' . "\n" . 'foo"');
 
 		self::assertEquals(
 			[['foo', 'bar'], ['bar', "\nfoo"]],
@@ -132,6 +132,7 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 			['fo"o', '"fo""o",'],
 			['foo', 'foo,'],
 			['foo', '"foo",'],
+			['fo,o', '"fo,o",'],
 			['fo"o', '"fo""o",'],
 			['foo"', 'foo",'],
 			['fo"o', 'fo"o,'],
