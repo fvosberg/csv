@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Unit\Rattazonk\CSV;
+namespace Rattazonk\CSV\Tests\Unit;
 
 use Rattazonk\CSV\Csv;
 
@@ -129,17 +129,82 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 
 	public function firstFieldValues() {
 		return [
-			// expected => input
+			['fo"o', '"fo""o",'],
 			['foo', 'foo,'],
 			['foo', '"foo",'],
 			['fo"o', '"fo""o",'],
-			['fo"o', 'fo"o,']
+			['foo"', 'foo",'],
+			['fo"o', 'fo"o,'],
+			['fo"o', "fo\"o\nbaar"]
 		];
 	}
 
 	/**
-	 * @depends getFirstFieldByNextFieldInCurrentRow
+	 * @test
+	 * @dataProvider secondFieldValues
 	 */
-	public function getFollowingFieldByNextFieldInCurrentRow($subject) {
+	public function getFollowingFieldByNextFieldInCurrentRow($expected, $input) {
+		$this->subject->readString($input);
+		$this->subject->getNextFieldInCurrentRow();
+
+		self::assertEquals(
+			$expected,
+			$this->subject->getNextFieldInCurrentRow()
+		);
+	}
+
+	public function secondFieldValues() {
+		return [
+			// expected => input
+			['bar', 'foo,bar'],
+			['bar', '"foo","bar"'],
+			['bar', '"foo",bar'],
+			['ba"r', '"fo""o","ba""r"'],
+			['ba"r', 'fo"o,ba"r']
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider multipleLines
+	 */
+	public function getNextFieldInCurrentRowReturnsFalseAfterTheLastColumn($expected, $input) {
+		$this->subject->readString($input);
+		$this->subject->getNextFieldInCurrentRow();
+		$this->subject->getNextFieldInCurrentRow();
+
+		self::assertFalse($this->subject->getNextFieldInCurrentRow());
+	}
+
+	public function multipleLines() {
+		return [
+			// expected => input
+			['bar', "foo,bar\nbar,foo"],
+			['bar', "\"foo\",\"bar\"\n\"bar\",\"foo\""],
+			['bar', "\"foo\",bar\nbar,\"foo\""],
+			['ba"r', '"fo""o","ba""r"' . "\n" . '"ba""r","fo""o"'],
+			['ba"r', 'fo"o,ba"r' . "\n" . 'ba"r,fo"o']
+		];
+	}
+
+	/**
+	 * @test
+	 */
+	public function canReadFile() {
+		$this->subject->readFile(
+			$this->getFixturePath('SimpleCommaSeparatedFile')
+		);
+
+		self::assertEquals(
+			[
+				['FirstFirst', 'FirstSecond', 'FirstThird"'],
+				['Second"First', 'SecondSecond', 'SecondThird']
+			],
+			$this->subject->toArray()
+		);
+	}
+
+	protected function getFixturePath($file) {
+		return __DIR__ . "/../Fixtures/$file.csv";
 	}
 }

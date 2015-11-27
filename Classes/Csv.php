@@ -38,6 +38,12 @@ class Csv {
 	protected $lastCharacter;
 
 	/**
+	 * flag to allow getNextFieldInCurrentRow to jump to the next row
+	 * @var bool
+	 */
+	protected $jumpToNextRow = FALSE;
+
+	/**
 	 * @param resource $resource
 	 */
 	public function setResource($resource) {
@@ -49,27 +55,25 @@ class Csv {
 	 */
 	public function toArray() {
 		$lines = [];
-		$currentLine = '';
-		while(($char = fgetc($this->resource)) !== FALSE) {
-			if($char !== $this->lineTerminator){
-				$currentLine .= $char;
-			} else {
-				$lines[] = $currentLine;
-				$currentLine = '';
-			}
-		}
-		// if the last char is not a line terminator the last line must be added 
-		// separatly
-		if($currentLine) {
-			$lines[] = $currentLine;
-		}
-		foreach($lines as &$line) {
-			$line = explode($this->separator, $line);
-			foreach($line as &$column) {
-				$column = trim($column, $this->enclosure);
-			}
+		foreach($this->getLines() as $line) {
+			$lines[] = $line;
 		}
 		return $lines;
+	}
+
+	public function getLines() {
+		while(($line = $this->getNextLine())) {
+			yield $line;
+		}
+	}
+
+	public function getNextLine() {
+		$fields = [];
+		$this->jumpToNextRow = TRUE;
+		while(($field = $this->getNextFieldInCurrentRow()) !== FALSE) {
+			$fields[] = $field;
+		}
+		return $fields;
 	}
 
 	/**
@@ -81,19 +85,29 @@ class Csv {
 	public function getNextFieldInCurrentRow() {
 		$field = '';
 		$enclosed = FALSE;
-		while($this->getNextCharacter()) {
-			// this field ends when a separator is found
-			if($this->currentCharacter === $this->separator) {
-				break;
+		if($this->currentCharacter != $this->lineTerminator || $this->jumpToNextRow) {
+			$this->jumpToNextRow = FALSE;
+			while($this->getNextCharacter()) {
+				// this field ends when a separator is found
+				if($this->currentCharacter === $this->separator) {
+					break;
+				}
+				if($this->currentCharacter == $this->enclosure) {
+					if(!$field) {
+						$enclosed = TRUE;
+						continue;
+					} else if($enclosed) {
+						$enclosed = FALSE;
+						continue;
+					} else if($this->lastCharacter == $this->enclosure) {
+						$enclosed = TRUE;
+					}
+				}
+				if(!$enclosed && $this->currentCharacter == $this->lineTerminator) {
+					break;
+				}
+				$field .= $this->getCurrentCharacter();
 			}
-			if(!$field && $this->currentCharacter == $this->enclosure) {
-				$enclosed = TRUE;
-				continue;
-			}
-			if($enclosed && $this->currentCharacter == $this->enclosure && $this->lastCharacter !== $this->enclosure) {
-				continue;
-			}
-			$field .= $this->getCurrentCharacter();
 		}
 		return $field ? $field : FALSE;
 	}
@@ -143,5 +157,12 @@ class Csv {
 	 */
 	public function readString($input) {
 		$this->resource = fopen("data://text/plain,$input", 'r');
+	}
+
+	/**
+	 * @param string $path
+	 */
+	public function readFile($path) {
+		$this->resource = fopen($path, 'r');
 	}
 }
