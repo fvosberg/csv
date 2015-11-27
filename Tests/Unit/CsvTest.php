@@ -205,6 +205,32 @@ class CsvTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
+	/**
+	 * @test
+	 */
+	public function firstLineAsKeys() {
+		$this->subject->setFirstLineAsKeys(TRUE);
+		$this->subject->readString(
+			'"first col","second col"' . "\n" .
+			'"foo","bar"' . "\n" .
+			'"baz","bafoo"'
+		);
+
+		self::assertEquals(
+			['first col' => 'foo', 'second col' => 'bar'],
+			$this->subject->getNextLine()
+		);
+
+		self::assertEquals(
+			['first col' => 'baz', 'second col' => 'bafoo'],
+			$this->subject->getNextLine()
+		);
+
+		self::assertFalse(
+			$this->subject->getNextLine()
+		);
+	}
+
 	protected function getFixturePath($file) {
 		return __DIR__ . "/../Fixtures/$file.csv";
 	}

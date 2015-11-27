@@ -44,6 +44,16 @@ class Csv {
 	protected $jumpToNextRow = FALSE;
 
 	/**
+	 * @var bool
+	 */
+	protected $firstLineAsKeys = FALSE;
+
+	/**
+	 * @var array
+	 */
+	protected $columnNames;
+
+	/**
 	 * @param resource $resource
 	 */
 	public function setResource($resource) {
@@ -68,12 +78,22 @@ class Csv {
 	}
 
 	public function getNextLine() {
+		if($this->firstLineAsKeys) {
+			if(!is_array($this->columnNames)) {
+				$this->firstLineAsKeys = FALSE;
+				$this->columnNames = $this->getNextLine();
+				$this->firstLineAsKeys = TRUE;
+			}
+		}
 		$fields = [];
 		$this->jumpToNextRow = TRUE;
 		while(($field = $this->getNextFieldInCurrentRow()) !== FALSE) {
 			$fields[] = $field;
 		}
-		return $fields;
+		if($fields && $this->firstLineAsKeys) {
+			$fields = array_combine($this->columnNames, $fields);
+		}
+		return $fields ? $fields : FALSE;
 	}
 
 	/**
@@ -163,5 +183,12 @@ class Csv {
 	 */
 	public function readFile($path) {
 		$this->resource = fopen($path, 'r');
+	}
+
+	/**
+	 * @param bool $flag
+	 */
+	public function setFirstLineAsKeys($flag) {
+		$this->firstLineAsKeys = $flag;
 	}
 }
